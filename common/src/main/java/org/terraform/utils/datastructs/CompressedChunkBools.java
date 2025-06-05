@@ -18,7 +18,7 @@ public class CompressedChunkBools {
 
             Server: paper-1.21.5-93
             Seed: -1565193744182814265
-            WorldBorder: 4,050 x 4,050
+            WorldBorder: 10,050 x 10,050
             TerraformGenerator: 19.1.1
 
             plugins/TerraformGenerator/config.yml
@@ -27,14 +27,17 @@ public class CompressedChunkBools {
                 moisture-frequency: 0.015
                 oceanic-threshold: 11.0
 
-        (y - TerraformGeneratorPlugin.injector.getMinY()) may be up to 418.
+        (y - TerraformGeneratorPlugin.injector.getMaxY()) may be up to 68.
 
-        So, we need 418 - 385 + 1  = 34 of additional matrix length to
-        avoid java.lang.ArrayIndexOutOfBoundsException; 50 with headroom.
+        So, we need an additional matrix length of 100 with headroom to
+        avoid java.lang.ArrayIndexOutOfBoundsException.
      */
-    short[][] matrix = new short[50 + TerraformGeneratorPlugin.injector.getMaxY() - TerraformGeneratorPlugin.injector.getMinY() + 1][16];
+    short[][] matrix = new short[100 + TerraformGeneratorPlugin.injector.getMaxY() - TerraformGeneratorPlugin.injector.getMinY() + 1][16];
 
     public void set(int x, int y, int z){
+        /*if(y > TerraformGeneratorPlugin.injector.getMaxY()) {
+            System.out.println(String.format("ADD-Y: %d", y - TerraformGeneratorPlugin.injector.getMaxY()));
+        }*/
         matrix[y-TerraformGeneratorPlugin.injector.getMinY()][x] |= 0b1 << z;
     }
     public void unSet(int x, int y, int z){
