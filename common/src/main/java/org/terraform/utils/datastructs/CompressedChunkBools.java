@@ -27,7 +27,7 @@ public class CompressedChunkBools {
                 moisture-frequency: 0.015
                 oceanic-threshold: 11.0
 
-        (y - TerraformGeneratorPlugin.injector.getMaxY()) may be up to 68.
+        (y - TerraformGeneratorPlugin.injector.getMaxY()) may be up to 88.
 
         So, we need an additional matrix length of 100 with headroom to
         avoid java.lang.ArrayIndexOutOfBoundsException.
@@ -35,13 +35,16 @@ public class CompressedChunkBools {
     short[][] matrix = new short[100 + TerraformGeneratorPlugin.injector.getMaxY() - TerraformGeneratorPlugin.injector.getMinY() + 1][16];
 
     public void set(int x, int y, int z){
-        /*if(y > TerraformGeneratorPlugin.injector.getMaxY()) {
-            System.out.println(String.format("ADD-Y: %d", y - TerraformGeneratorPlugin.injector.getMaxY()));
-        }*/
-        matrix[y-TerraformGeneratorPlugin.injector.getMinY()][x] |= 0b1 << z;
+        if(y > TerraformGeneratorPlugin.injector.getMaxY()) {
+            System.out.println(String.format("DEBUG: at %d:%d:%d headroom needed: %d",
+                    x, y, z, y - TerraformGeneratorPlugin.injector.getMaxY()));
+        }
+        int idY = y-TerraformGeneratorPlugin.injector.getMinY();
+        matrix[idY][x] = (short) (matrix[idY][x] | (0b1 << z));
     }
     public void unSet(int x, int y, int z){
-        matrix[y-TerraformGeneratorPlugin.injector.getMinY()][x] &= 255 ^ (0b1 << z);
+        int idY = y-TerraformGeneratorPlugin.injector.getMinY();
+        matrix[idY][x] = (short) (matrix[idY][x] & (255 ^ (0b1 << z)));
     }
 
     public boolean isSet(int x, int y, int z){
