@@ -32,12 +32,14 @@ public class CompressedChunkBools {
         So, we need an additional matrix length of 100 with headroom to
         avoid java.lang.ArrayIndexOutOfBoundsException.
      */
-    short[][] matrix = new short[100 + TerraformGeneratorPlugin.injector.getMaxY() - TerraformGeneratorPlugin.injector.getMinY() + 1][16];
+    short[][] matrix = new short[500 + TerraformGeneratorPlugin.injector.getMaxY() - TerraformGeneratorPlugin.injector.getMinY() + 1][16];
 
+    private static int maxHeadroom = 0;
     public void set(int x, int y, int z){
-        if(y > TerraformGeneratorPlugin.injector.getMaxY()) {
+        if(y - TerraformGeneratorPlugin.injector.getMaxY() > maxHeadroom) {
+            maxHeadroom = y - TerraformGeneratorPlugin.injector.getMaxY();
             System.out.println(String.format("DEBUG: at %d:%d:%d headroom needed: %d",
-                    x, y, z, y - TerraformGeneratorPlugin.injector.getMaxY()));
+                    x, y, z, maxHeadroom));
         }
         int idY = y-TerraformGeneratorPlugin.injector.getMinY();
         matrix[idY][x] = (short) (matrix[idY][x] | (0b1 << z));
